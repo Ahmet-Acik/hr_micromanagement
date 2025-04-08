@@ -402,3 +402,114 @@ SET salary = CASE
                  WHEN first_name = 'Alice' AND last_name = 'Johnson' THEN 96000.00
     END
 WHERE (first_name = 'Steve' AND last_name = 'Allen') OR (first_name = 'Alice' AND last_name = 'Johnson');
+
+-- File: string_date_window_practices.sql
+
+-- ### 5. String and Date Functions
+
+-- 36. String Functions
+-- LENGTH: Get the length of a string
+SELECT LENGTH('Hello World') AS string_length;
+
+-- REPLACE: Replace part of a string
+SELECT REPLACE('Hello World', 'World', 'SQL') AS replaced_string;
+
+-- CONCAT: Concatenate strings
+SELECT CONCAT('Hello', ' ', 'World') AS concatenated_string;
+
+-- 37. CONCAT() Function
+SELECT CONCAT(first_name, ' ', last_name) AS full_name
+FROM employees;
+
+-- 38. LOWER() Function
+SELECT LOWER(email) AS lowercase_email
+FROM employees;
+
+-- 39. UPPER() Function
+SELECT UPPER(first_name) AS uppercase_name
+FROM employees;
+
+-- 40. TRIM() Function
+SELECT TRIM('   Hello World   ') AS trimmed_string;
+
+-- 41. SUBSTRING() Function
+SELECT SUBSTRING(email, 1, 5) AS email_prefix
+FROM employees;
+
+-- 42. Date Functions
+-- CURRENT_DATE: Get the current date
+SELECT CURRENT_DATE() AS today;
+
+-- DATE_ADD: Add days to a date
+SELECT DATE_ADD(hire_date, INTERVAL 30 DAY) AS new_date
+FROM employees;
+
+-- DATEDIFF: Calculate the difference between two dates
+SELECT DATEDIFF(end_date, start_date) AS project_duration
+FROM projects;
+
+-- ### 6. Subqueries, Views, and CTEs
+
+-- 43. View
+CREATE VIEW employee_salaries AS
+SELECT first_name, last_name, salary
+FROM employees;
+
+-- 44. Difference Between View and Table
+-- Views are virtual and do not store data, while tables are physical and store data persistently.
+
+-- 45. Common Table Expression (CTE)
+WITH high_salaries AS (
+    SELECT first_name, last_name, salary
+    FROM employees
+    WHERE salary > 90000
+)
+SELECT * FROM high_salaries;
+
+-- 46. Recursive Query Using CTE
+WITH RECURSIVE employee_hierarchy AS (
+    SELECT id, first_name, department_id AS manager_id
+    FROM employees
+    WHERE department_id IS NULL
+    UNION ALL
+    SELECT e.id, e.first_name, e.department_id AS manager_id
+    FROM employees e
+    INNER JOIN employee_hierarchy eh ON e.department_id = eh.id
+)
+SELECT * FROM employee_hierarchy;
+
+-- 47. Materialized View
+-- Materialized views store the result of a query physically, unlike regular views.
+
+-- 48. Difference Between View and Materialized View
+-- Views are virtual and fetch data dynamically, while materialized views store query results for faster access.
+
+-- ### 7. Window Functions
+
+-- 49. Window Function
+SELECT first_name, salary,
+       RANK() OVER (ORDER BY salary DESC) AS salary_rank
+FROM employees;
+
+SELECT VERSION();
+
+-- 50. ROW_NUMBER(), RANK(), and DENSE_RANK()
+SELECT
+    e.first_name,
+    e.salary,
+    ROW_NUMBER() OVER (ORDER BY e.salary DESC) AS row_num,
+    RANK() OVER (ORDER BY e.salary DESC) AS rank_num,
+    DENSE_RANK() OVER (ORDER BY e.salary DESC) AS dense_rank_num
+FROM
+    employees e;
+
+
+-- 51. NTILE() Function
+SELECT first_name, salary,
+       NTILE(4) OVER (ORDER BY salary DESC) AS quartile
+FROM employees;
+
+-- 52. ROWS and RANGE in Window Functions
+SELECT first_name, salary,
+       SUM(salary) OVER (ORDER BY salary ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS salary_sum
+FROM employees;
