@@ -267,3 +267,138 @@ FROM employees
 ORDER BY salary DESC
 LIMIT 3;
 
+
+
+-- 1. String Functions
+-- LENGTH: Get the length of a string
+SELECT LENGTH('Hello World') AS string_length;
+
+-- REPLACE: Replace part of a string
+SELECT REPLACE('Hello World', 'World', 'SQL') AS replaced_string;
+
+-- CONCAT: Concatenate strings
+SELECT CONCAT('Hello', ' ', 'World') AS concatenated_string;
+
+-- LOWER: Convert a string to lowercase
+SELECT LOWER('HELLO WORLD') AS lowercase_string;
+
+-- UPPER: Convert a string to uppercase
+SELECT UPPER('hello world') AS uppercase_string;
+
+-- TRIM: Remove leading and trailing spaces
+SELECT TRIM('   Hello World   ') AS trimmed_string;
+
+-- SUBSTRING: Extract a portion of a string
+SELECT SUBSTRING('Hello World', 1, 5) AS substring_example;
+
+-- 2. Date Functions
+-- CURRENT_DATE: Get the current date
+SELECT CURRENT_DATE() AS today;
+
+-- DATE_ADD: Add days to a date
+SELECT DATE_ADD('2023-01-01', INTERVAL 30 DAY) AS new_date;
+
+-- DATEDIFF: Calculate the difference between two dates
+SELECT DATEDIFF('2023-12-31', '2023-01-01') AS date_difference;
+
+-- 3. Joins
+-- INNER JOIN: Retrieve employees and their respective departments
+SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name
+FROM employees e
+INNER JOIN departments d ON e.department_id = d.id;
+
+-- LEFT JOIN: Retrieve all employees and their departments (even if no department is assigned)
+SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.id;
+
+-- RIGHT JOIN: Retrieve all departments and their employees (even if no employees are assigned)
+SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name
+FROM employees e
+RIGHT JOIN departments d ON e.department_id = d.id;
+
+-- FULL OUTER JOIN: Simulate using UNION of LEFT JOIN and RIGHT JOIN
+SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.id
+UNION
+SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name
+FROM employees e
+RIGHT JOIN departments d ON e.department_id = d.id;
+
+-- SELF JOIN: Find employees who share the same department
+SELECT e1.first_name AS employee_1, e2.first_name AS employee_2, d.name AS department_name
+FROM employees e1
+INNER JOIN employees e2 ON e1.department_id = e2.department_id AND e1.id != e2.id
+INNER JOIN departments d ON e1.department_id = d.id;
+
+-- CROSS JOIN: Assign all employees to all projects (Cartesian product)
+SELECT e.first_name, p.name AS project_name
+FROM employees e
+CROSS JOIN projects p;
+
+-- 4. Subqueries
+-- Subquery: Find employees working in the "DevOps" department
+SELECT first_name, last_name
+FROM employees
+WHERE department_id = (SELECT id FROM departments WHERE name = 'DevOps');
+
+-- Nested Query: Find employees working on projects with a budget greater than $100,000
+SELECT first_name, last_name
+FROM employees
+WHERE id IN (
+    SELECT employee_id
+    FROM employee_projects
+    WHERE project_id IN (
+        SELECT id
+        FROM projects
+        WHERE budget > 100000
+    )
+);
+
+-- 5. Aggregate Functions
+-- COUNT: Count the number of employees
+SELECT COUNT(*) AS total_employees FROM employees;
+
+-- SUM: Calculate the total salary of all employees
+SELECT SUM(salary) AS total_salary FROM employees;
+
+-- AVG: Calculate the average salary of employees
+SELECT AVG(salary) AS average_salary FROM employees;
+
+-- MIN: Find the minimum salary
+SELECT MIN(salary) AS minimum_salary FROM employees;
+
+-- MAX: Find the maximum salary
+SELECT MAX(salary) AS maximum_salary FROM employees;
+
+-- 6. Grouping and Filtering
+-- GROUP BY: Group employees by department and count them
+SELECT d.name AS department_name, COUNT(e.id) AS employee_count
+FROM employees e
+INNER JOIN departments d ON e.department_id = d.id
+GROUP BY d.name;
+
+-- HAVING: Filter departments with more than 3 employees
+SELECT d.name AS department_name, COUNT(e.id) AS employee_count
+FROM employees e
+INNER JOIN departments d ON e.department_id = d.id
+GROUP BY d.name
+HAVING COUNT(e.id) > 3;
+
+-- 7. Ranking and Window Functions
+-- Find top 3 salaries with rank
+SELECT DISTINCT salary, employees.first_name, employees.last_name,
+       DENSE_RANK() OVER (ORDER BY salary DESC) AS salary_rank
+FROM employees
+ORDER BY salary DESC
+LIMIT 3;
+
+-- 8. Update Queries
+-- Update salaries of Steve Allen and Alice Johnson
+UPDATE employees
+SET salary = CASE
+                 WHEN first_name = 'Steve' AND last_name = 'Allen' THEN 97000.00
+                 WHEN first_name = 'Alice' AND last_name = 'Johnson' THEN 96000.00
+    END
+WHERE (first_name = 'Steve' AND last_name = 'Allen') OR (first_name = 'Alice' AND last_name = 'Johnson');
