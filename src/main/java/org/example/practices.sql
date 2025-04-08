@@ -513,3 +513,127 @@ FROM employees;
 SELECT first_name, salary,
        SUM(salary) OVER (ORDER BY salary ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS salary_sum
 FROM employees;
+
+-- 53. PARTITION BY Clause
+SELECT first_name, department_id, salary,
+       RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS department_rank
+FROM employees;
+
+-- File: partitioning_and_miscellaneous_practices.sql
+
+-- ### 13. Partitioning & Large Dataset Management
+
+-- 87. What is a partitioned table in SQL?
+-- Example: Creating a partitioned table for employees based on hire_date
+CREATE TABLE employees_partitioned (
+    id INT NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    hire_date DATE NOT NULL,
+    salary DECIMAL(10, 2) NOT NULL
+)
+PARTITION BY RANGE (YEAR(hire_date)) (
+    PARTITION p_before_2020 VALUES LESS THAN (2020),
+    PARTITION p_2020 VALUES LESS THAN (2021),
+    PARTITION p_2021 VALUES LESS THAN (2022),
+    PARTITION p_2022 VALUES LESS THAN (2023),
+    PARTITION p_future VALUES LESS THAN MAXVALUE
+);
+
+-- 88. How do partitioned tables help improve performance?
+-- Explanation: Partitioning allows queries to scan only relevant partitions, reducing I/O and improving performance.
+
+-- 89. What is a range partition and how do you create one?
+-- Example: Creating a range partition for projects based on budget
+CREATE TABLE projects_partitioned (
+    id INT NOT NULL,
+    name VARCHAR(100),
+    budget DECIMAL(15, 2) NOT NULL
+)
+PARTITION BY RANGE (budget) (
+    PARTITION p_low_budget VALUES LESS THAN (100000),
+    PARTITION p_medium_budget VALUES LESS THAN (500000),
+    PARTITION p_high_budget VALUES LESS THAN MAXVALUE
+);
+
+-- 90. What is the difference between ROWS and RANGE in SQL?
+-- Example: Using ROWS and RANGE in a window function
+SELECT first_name, salary,
+       SUM(salary) OVER (ORDER BY salary ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS salary_sum_rows,
+       SUM(salary) OVER (ORDER BY salary RANGE BETWEEN 1000 PRECEDING AND 1000 FOLLOWING) AS salary_sum_range
+FROM employees;
+
+-- 91. How do you handle large datasets in SQL efficiently?
+-- Example: Using indexing and partitioning for efficient queries
+CREATE INDEX idx_salary ON employees (salary);
+-- Query using the index
+SELECT first_name, last_name, salary
+FROM employees
+WHERE salary > 80000;
+
+-- ### 14. Miscellaneous SQL Concepts
+
+-- 92. What is normalization in SQL?
+-- Example: Normalizing data into separate tables
+CREATE TABLE departments_normalized (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE employees_normalized (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES departments_normalized(id)
+);
+
+-- 93. What is denormalization in SQL?
+-- Example: Denormalizing data into a single table
+CREATE TABLE employees_denormalized (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    department_name VARCHAR(100) NOT NULL
+);
+
+-- 94. How do you define a schema in SQL?
+-- Example: Creating a schema
+CREATE SCHEMA hr_management;
+
+-- 95. What is SQL injection and how do you prevent it?
+-- Example: Using prepared statements to prevent SQL injection
+-- In application code:
+-- SELECT * FROM employees WHERE email = ?;
+
+-- 96. What is sharding in SQL?
+-- Example: Conceptual explanation of sharding
+-- Sharding involves splitting a large table into smaller tables distributed across multiple databases.
+
+-- 97. How do you perform database backup and restore operations?
+-- Example: Backup and restore commands
+-- Backup:
+-- mysqldump -u username -p database_name > backup.sql
+-- Restore:
+-- mysql -u username -p database_name < backup.sql
+
+-- 98. What are stored procedures and why are they useful?
+-- Example: Creating a stored procedure
+DELIMITER //
+CREATE PROCEDURE GetEmployeeById(IN emp_id INT)
+BEGIN
+    SELECT * FROM employees WHERE id = emp_id;
+END //
+DELIMITER ;
+
+-- 99. What are common errors you might encounter while writing SQL queries?
+-- Example: Syntax error
+-- SELECT * FROM employees WHERE salary = 'abc'; -- Incorrect data type
+
+-- 100. What are SQL optimization techniques for handling large databases?
+-- Example: Using indexing and query optimization
+CREATE INDEX idx_department_id ON employees (department_id);
+-- Optimized query
+SELECT first_name, last_name
+FROM employees
+WHERE department_id = 1;
