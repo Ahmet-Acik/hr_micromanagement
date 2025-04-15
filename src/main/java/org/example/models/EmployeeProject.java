@@ -1,5 +1,5 @@
 // EmployeeProject.java
-package org.example;
+package org.example.models;
 
 public class EmployeeProject {
     private int employeeId;

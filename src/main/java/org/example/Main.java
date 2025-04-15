@@ -1,6 +1,8 @@
 package org.example;
 
-import java.sql.Date;
+import org.example.models.Department;
+import org.example.models.DepartmentDAO;
+
 import java.sql.SQLException;
 import java.util.List;
 

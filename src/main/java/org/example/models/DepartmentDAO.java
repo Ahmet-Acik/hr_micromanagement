@@ -1,5 +1,7 @@
 // src/main/java/org/example/DepartmentDAO.java
-package org.example;
+package org.example.models;
+
+import org.example.utils.DatabaseUtil;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -68,6 +68,14 @@ INSERT INTO employee_projects (employee_id, project_id) VALUES
 (20, 1004);
 
 
+
+SELECT * FROM employees;
+
+ SELECT id, first_name AS firstName, last_name AS lastName, email, phone_number AS phoneNumber,
+        hire_date AS hireDate, job_id AS jobId, salary, department_id AS departmentId
+ FROM employees
+ WHERE department_id = 1;
+
 -- File: hr_management_practices.sql
 
 -- 3. Joins, Subqueries, and Set Operators
@@ -587,7 +595,7 @@ CREATE TABLE employees_normalized (
     department_id INT,
     FOREIGN KEY (department_id) REFERENCES departments_normalized(id)
 );
-
+-- Normalization reduces data redundancy and improves data integrity.
 -- 93. What is denormalization in SQL?
 -- Example: Denormalizing data into a single table
 CREATE TABLE employees_denormalized (
@@ -629,7 +637,7 @@ DELIMITER ;
 -- 99. What are common errors you might encounter while writing SQL queries?
 -- Example: Syntax error
 -- SELECT * FROM employees WHERE salary = 'abc'; -- Incorrect data type
-
+-- Example: Division by zero error
 -- 100. What are SQL optimization techniques for handling large databases?
 -- Example: Using indexing and query optimization
 CREATE INDEX idx_department_id ON employees (department_id);

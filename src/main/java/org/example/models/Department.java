@@ -1,5 +1,5 @@
 // src/main/java/org/example/Department.java
-package org.example;
+package org.example.models;
 
 public class Department {
     private int id;

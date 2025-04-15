@@ -1,5 +1,5 @@
 // Job.java
-package org.example;
+package org.example.models;
 
 public class Job {
     private int id;

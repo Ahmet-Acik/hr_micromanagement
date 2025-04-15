@@ -1,5 +1,5 @@
 // Project.java
-package org.example;
+package org.example.models;
 
 import java.util.Date;
 
